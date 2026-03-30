@@ -5,6 +5,19 @@ const router = express.Router()
 const MongoClient = require('mongodb').MongoClient;
 const url = config.MONGODB_URI;
 
+const rateLimit = require('express-rate-limit');
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10, // limit each IP to 10 login requests per windowMs
+    message: {
+        status: "error",
+        message: "Too many login attempts from this IP, please try again later."
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 router.post('/customers/register', async (req, res) => {
 
     const client = await MongoClient.connect(url, { useNewUrlParser: true })
@@ -52,7 +65,7 @@ router.post('/customers/find', async (req, res) => {
 // Authentication Bypass Example
 // curl -X POST http://localhost:3000/customers/login/ --data "{\"email\": {\"\$gt\":\"\"} , \"password\": {\"\$gt\":\"\"}}" -H "Content-Type: application/json"
 
-router.post('/customers/login', async (req, res) => {
+router.post('/customers/login', loginLimiter, async (req, res) => {
 
     const client = await MongoClient.connect(url, { useNewUrlParser: true })
         .catch(err => { console.log(err); });
