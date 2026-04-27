@@ -12,6 +12,7 @@ namespace WebFox.Controllers
 
         private readonly ILogger<Sqli> _logger;
 
+
         public Sqli(ILogger<Sqli> logger)
         {
             _logger = logger;
