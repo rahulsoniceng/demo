@@ -10,10 +10,9 @@ client.connect();
 // VULNERABLE ROUTE
 app.post('/user', (req, res) => {
   const userId = req.body.id;
-  // Dangerous: Direct string concatenation
-  const query = "SELECT * FROM users WHERE id = '" + userId + "';";
+  const query = 'SELECT * FROM users WHERE id = $1;';
 
-  client.query(query, (err, result) => {
+  client.query(query, [userId], (err, result) => {
     if (err) throw err;
     res.send(result.rows);
   });
